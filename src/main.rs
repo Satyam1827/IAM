@@ -5,6 +5,9 @@ mod auth;
 mod errors;
 mod services;
 mod dto;
+mod handlers;
+mod routes;
+mod app;
 
 use anyhow::Result;
 use std::sync::Arc;
@@ -25,12 +28,32 @@ async fn main() -> Result<()> {
 
     db::migrate::run(&pool).await?;
 
-    let _state = Arc::new(AppState {
+    let state = Arc::new(AppState {
         db: pool,
-        config,
+        config: config.clone(),
     });
 
-    println!("Database ready.");
+    let app =
+        app::create_router(state);
+
+    let listener =
+        tokio::net::TcpListener::bind(
+            format!(
+                "{}:{}",
+                config.host,
+                config.port
+            )
+        )
+        .await?;
+
+    println!(
+        "Listening on {}:{}",
+        config.host,
+        config.port
+    );
+
+    axum::serve(listener, app)
+        .await?;
 
     Ok(())
 }
