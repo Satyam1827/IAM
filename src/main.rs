@@ -1,6 +1,10 @@
 mod config;
 mod db;
 mod state;
+mod auth;
+mod errors;
+mod services;
+mod dto;
 
 use anyhow::Result;
 use std::sync::Arc;
