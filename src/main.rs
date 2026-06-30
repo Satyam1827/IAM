@@ -8,6 +8,7 @@ mod dto;
 mod handlers;
 mod routes;
 mod app;
+mod middleware;
 
 use anyhow::Result;
 use std::sync::Arc;

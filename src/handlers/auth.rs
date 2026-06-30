@@ -17,6 +17,8 @@ use crate::{
     state::AppState,
 };
 
+use crate::auth::extractor::CurrentUser;
+
 pub async fn register(
     State(state): State<Arc<AppState>>,
     Json(req): Json<RegisterRequest>,
@@ -35,14 +37,30 @@ pub async fn login(
 }
 
 pub async fn refresh(
-    State(_state): State<Arc<AppState>>,
-    Json(_req): Json<RefreshRequest>,
-) -> Result<(), AppError> {
-    todo!()
+    current_user: CurrentUser,
+    State(state): State<Arc<AppState>>,
+    Json(req): Json<RefreshRequest>,
+) -> Result<Json<TokenResponse>, AppError>
+{
+    let tokens =
+        auth::refresh(
+            state,
+            current_user.session_id,
+            req.refresh_token,
+        )
+        .await?;
+
+    Ok(Json(tokens))
 }
 
 pub async fn logout(
-    State(_state): State<Arc<AppState>>,
-) -> Result<(), AppError> {
-    todo!()
+    current_user: CurrentUser,
+    State(state): State<Arc<AppState>>,
+) -> Result<(), AppError>
+{
+    auth::logout(
+        state,
+        current_user.session_id,
+    )
+    .await
 }
