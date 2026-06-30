@@ -97,3 +97,21 @@ pub fn verify_refresh_token(
         hash,
     )
 }
+
+pub fn generate_token_pair(
+    user_id: Uuid,
+    session_id: Uuid,
+    secret: &str,
+) -> Result<(String, String)> {
+    let access =
+        generate_access_token(
+            user_id,
+            session_id,
+            secret,
+        )?;
+
+    let refresh =
+        generate_refresh_token();
+
+    Ok((access, refresh))
+}

@@ -74,3 +74,47 @@ pub async fn delete(
 
     Ok(())
 }
+
+pub async fn find_by_user(
+    pool: &PgPool,
+    user_id: Uuid,
+) -> Result<Vec<Session>> {
+    let sessions =
+        sqlx::query_as::<_, Session>(
+            r#"
+            SELECT *
+            FROM sessions
+            WHERE user_id = $1
+            ORDER BY created_at DESC
+            "#
+        )
+        .bind(user_id)
+        .fetch_all(pool)
+        .await?;
+
+    Ok(sessions)
+}
+
+pub async fn update_refresh_token(
+    pool: &PgPool,
+    session_id: Uuid,
+    refresh_hash: &str,
+    expires_at: DateTime<Utc>,
+) -> Result<()> {
+    sqlx::query(
+        r#"
+        UPDATE sessions
+        SET
+            refresh_token_hash = $1,
+            expires_at = $2
+        WHERE id = $3
+        "#
+    )
+    .bind(refresh_hash)
+    .bind(expires_at)
+    .bind(session_id)
+    .execute(pool)
+    .await?;
+
+    Ok(())
+}
