@@ -1,5 +1,5 @@
 use anyhow::Result;
-use sqlx::PgPool;
+use sqlx::{PgPool,Postgres, Transaction};
 use uuid::Uuid;
 
 use crate::db::models::organization::Organization;
@@ -65,4 +65,31 @@ pub async fn list(
         .await?;
 
     Ok(organizations)
+}
+
+pub async fn create_tx(
+    tx: &mut Transaction<'_, Postgres>,
+    name: &str,
+    slug: &str,
+    created_by: Uuid,
+) -> Result<Organization> {
+    let organization =
+        sqlx::query_as::<_, Organization>(
+            r#"
+            INSERT INTO organizations (
+                name,
+                slug,
+                created_by
+            )
+            VALUES ($1,$2,$3)
+            RETURNING *
+            "#
+        )
+        .bind(name)
+        .bind(slug)
+        .bind(created_by)
+        .fetch_one(tx.as_mut())
+        .await?;
+
+    Ok(organization)
 }

@@ -14,15 +14,25 @@ use crate::{
     state::AppState,
 };
 
+// Transaction prevents inconsistency
 pub async fn create(
     state: Arc<AppState>,
     current_user: CurrentUser,
     req: CreateOrganizationRequest,
 ) -> Result<OrganizationResponse, AppError>
 {
+    let mut tx =
+        state
+            .db
+            .begin()
+            .await
+            .map_err(|_| {
+                AppError::Internal
+            })?;
+
     let organization =
-        organization_repo::create(
-            &state.db,
+        organization_repo::create_tx(
+            &mut tx,
             &req.name,
             &req.slug,
             current_user.user_id,
@@ -31,9 +41,9 @@ pub async fn create(
         .map_err(|_| {
             AppError::Internal
         })?;
-    
-    membership_repo::create(
-        &state.db,
+
+    membership_repo::create_tx(
+        &mut tx,
         current_user.user_id,
         organization.id,
     )
@@ -41,7 +51,13 @@ pub async fn create(
     .map_err(|_| {
         AppError::Internal
     })?;
-    
+
+    tx.commit()
+        .await
+        .map_err(|_| {
+            AppError::Internal
+        })?;
+
     Ok(OrganizationResponse {
         id: organization.id,
         name: organization.name,
