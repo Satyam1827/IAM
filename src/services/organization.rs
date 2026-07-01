@@ -31,7 +31,17 @@ pub async fn create(
         .map_err(|_| {
             AppError::Internal
         })?;
-
+    
+    membership_repo::create(
+        &state.db,
+        current_user.user_id,
+        organization.id,
+    )
+    .await
+    .map_err(|_| {
+        AppError::Internal
+    })?;
+    
     Ok(OrganizationResponse {
         id: organization.id,
         name: organization.name,
