@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use axum::{
-    routing::post,
+    routing::{post, get, delete},
     Router,
 };
 
@@ -17,5 +17,13 @@ pub fn router()
         .route(
             "/{id}/members",
             post(member::add),
+        )
+        .route(
+            "/{id}/members",
+            get(member::list),
+        )
+        .route(
+            "/{org_id}/members/{user_id}",
+            delete(member::remove),
         )
 }

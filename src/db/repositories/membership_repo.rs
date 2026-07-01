@@ -121,3 +121,46 @@ pub async fn list_by_organization(
 
     Ok(memberships)
 }
+
+// lists the members of an organization
+pub async fn list_members(
+    pool: &PgPool,
+    organization_id: Uuid,
+) -> Result<Vec<Membership>> {
+    let members =
+        sqlx::query_as::<_, Membership>(
+            r#"
+            SELECT *
+            FROM memberships
+            WHERE organization_id = $1
+            ORDER BY created_at
+            "#
+        )
+        .bind(organization_id)
+        .fetch_all(pool)
+        .await?;
+
+    Ok(members)
+}
+
+// Remove a member of an organization
+pub async fn delete(
+    pool: &PgPool,
+    user_id: Uuid,
+    organization_id: Uuid,
+) -> Result<()> {
+    sqlx::query(
+        r#"
+        DELETE FROM memberships
+        WHERE
+            user_id = $1
+            AND organization_id = $2
+        "#
+    )
+    .bind(user_id)
+    .bind(organization_id)
+    .execute(pool)
+    .await?;
+
+    Ok(())
+}
