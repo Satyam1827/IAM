@@ -72,6 +72,17 @@ pub fn create_router(
                 ),
             ),
     )
+
+    .nest(
+        "/organizations",
+        routes::role::router()
+            .route_layer(
+                middleware::from_fn_with_state(
+                    state.clone(),
+                    auth::auth,
+                ),
+            ),
+    )
     .with_state(state)
 
     

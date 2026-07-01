@@ -97,3 +97,32 @@ pub async fn has_permission(
 
     Ok(exists.0)
 }
+
+
+// Inserts custom roles into roles table
+pub async fn create(
+    pool: &PgPool,
+    organization_id: Uuid,
+    name: &str,
+    description: Option<&str>,
+) -> Result<Role> {
+    let role =
+        sqlx::query_as::<_, Role>(
+            r#"
+            INSERT INTO roles (
+                organization_id,
+                name,
+                description
+            )
+            VALUES ($1,$2,$3)
+            RETURNING *
+            "#
+        )
+        .bind(organization_id)
+        .bind(name)
+        .bind(description)
+        .fetch_one(pool)
+        .await?;
+
+    Ok(role)
+}
