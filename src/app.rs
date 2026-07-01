@@ -29,16 +29,7 @@ pub fn create_router(
                 ),
             ),
     )
-    // .nest(
-    //     "/auth",
-    //     routes::auth::router()
-    //         .route_layer(
-    //             middleware::from_fn_with_state(
-    //                 state.clone(),
-    //                 auth::auth,
-    //             ),
-    //         ),
-    // )
+    
     .nest(
         "/sessions",
         routes::session::router()
@@ -48,6 +39,16 @@ pub fn create_router(
                     auth::auth,
                 ),
             ),
+    )
+    .nest(
+    "/auth",
+    routes::auth::protected_router()
+        .route_layer(
+            middleware::from_fn_with_state(
+                state.clone(),
+                auth::auth,
+            ),
+        ),
     )
     .with_state(state)
 }

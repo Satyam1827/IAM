@@ -12,5 +12,14 @@ pub fn router() -> Router<Arc<AppState>> {
         .route("/register", post(auth::register))
         .route("/login", post(auth::login))
         .route("/refresh", post(auth::refresh))
-        .route("/logout", post(auth::logout))
+}
+
+pub fn protected_router()
+-> Router<Arc<AppState>>
+{
+    Router::new()
+        .route(
+            "/logout",
+            post(auth::logout),
+        )
 }
