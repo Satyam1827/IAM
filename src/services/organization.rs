@@ -14,7 +14,7 @@ use crate::{
     state::AppState,
 };
 
-// Transaction prevents inconsistency
+
 pub async fn create(
     state: Arc<AppState>,
     current_user: CurrentUser,
