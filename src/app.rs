@@ -40,9 +40,21 @@ pub fn create_router(
                 ),
             ),
     )
+    
     .nest(
     "/auth",
     routes::auth::protected_router()
+        .route_layer(
+            middleware::from_fn_with_state(
+                state.clone(),
+                auth::auth,
+            ),
+        ),
+    )
+
+    .nest(
+    "/organizations",
+    routes::organization::router()
         .route_layer(
             middleware::from_fn_with_state(
                 state.clone(),
