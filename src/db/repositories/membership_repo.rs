@@ -164,3 +164,44 @@ pub async fn delete(
 
     Ok(())
 }
+
+pub async fn find_by_id(
+    pool: &PgPool,
+    id: Uuid,
+) -> Result<Option<Membership>> {
+    let membership =
+        sqlx::query_as::<_, Membership>(
+            r#"
+            SELECT *
+            FROM memberships
+            WHERE id = $1
+            "#
+        )
+        .bind(id)
+        .fetch_optional(pool)
+        .await?;
+
+    Ok(membership)
+}
+
+pub async fn assign_role(
+    pool: &PgPool,
+    membership_id: Uuid,
+    role_id: Uuid,
+) -> Result<()> {
+    sqlx::query(
+        r#"
+        INSERT INTO member_roles (
+            membership_id,
+            role_id
+        )
+        VALUES ($1,$2)
+        "#
+    )
+    .bind(membership_id)
+    .bind(role_id)
+    .execute(pool)
+    .await?;
+
+    Ok(())
+}

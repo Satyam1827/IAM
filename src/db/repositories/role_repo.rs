@@ -126,3 +126,22 @@ pub async fn create(
 
     Ok(role)
 }
+
+pub async fn find_by_id(
+    pool: &PgPool,
+    id: Uuid,
+) -> Result<Option<Role>> {
+    let role =
+        sqlx::query_as::<_, Role>(
+            r#"
+            SELECT *
+            FROM roles
+            WHERE id = $1
+            "#
+        )
+        .bind(id)
+        .fetch_optional(pool)
+        .await?;
+
+    Ok(role)
+}
