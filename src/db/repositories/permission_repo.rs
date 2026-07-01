@@ -1,5 +1,6 @@
 use anyhow::Result;
 use sqlx::{
+    PgPool,
     Postgres,
     Transaction,
 };
@@ -26,6 +27,25 @@ pub async fn create_tx(
         .bind(name)
         .bind(description)
         .fetch_one(tx.as_mut())
+        .await?;
+
+    Ok(permission)
+}
+
+pub async fn find_by_name(
+    pool: &PgPool,
+    name: &str,
+) -> Result<Option<Permission>> {
+    let permission =
+        sqlx::query_as::<_, Permission>(
+            r#"
+            SELECT *
+            FROM permissions
+            WHERE name = $1
+            "#
+        )
+        .bind(name)
+        .fetch_optional(pool)
         .await?;
 
     Ok(permission)

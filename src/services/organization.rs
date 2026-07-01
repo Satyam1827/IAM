@@ -95,19 +95,22 @@ pub async fn create(
         ),
     ];
 
-    for (name, description)
-    in permissions
-    {
+    for permission_name in [
+        "org:update",
+        "member:add",
+        "member:remove",
+        "role:assign",
+    ] {
         let permission =
-            permission_repo::create_tx(
-                &mut tx,
-                name,
-                Some(description),
+            permission_repo::find_by_name(
+                &state.db,
+                permission_name,
             )
             .await
-            .map_err(|_| {
-                AppError::Internal
-            })?;
+            .map_err(|_| AppError::Internal)?
+            .ok_or(
+                AppError::Internal,
+            )?;
 
         role_repo::assign_permission_tx(
             &mut tx,
@@ -115,9 +118,7 @@ pub async fn create(
             permission.id,
         )
         .await
-        .map_err(|_| {
-            AppError::Internal
-        })?;
+        .map_err(|_| AppError::Internal)?;
     }
         
     tx.commit()

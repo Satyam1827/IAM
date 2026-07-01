@@ -77,3 +77,47 @@ pub async fn assign_role_tx(
 
     Ok(())
 }
+
+pub async fn find(
+    pool: &PgPool,
+    user_id: Uuid,
+    organization_id: Uuid,
+) -> Result<Option<Membership>> {
+    let membership =
+        sqlx::query_as::<_, Membership>(
+            r#"
+            SELECT *
+            FROM memberships
+            WHERE
+                user_id = $1
+                AND
+                organization_id = $2
+            "#
+        )
+        .bind(user_id)
+        .bind(organization_id)
+        .fetch_optional(pool)
+        .await?;
+
+    Ok(membership)
+}
+
+pub async fn list_by_organization(
+    pool: &PgPool,
+    organization_id: Uuid,
+) -> Result<Vec<Membership>> {
+    let memberships =
+        sqlx::query_as::<_, Membership>(
+            r#"
+            SELECT *
+            FROM memberships
+            WHERE organization_id = $1
+            ORDER BY created_at
+            "#
+        )
+        .bind(organization_id)
+        .fetch_all(pool)
+        .await?;
+
+    Ok(memberships)
+}
