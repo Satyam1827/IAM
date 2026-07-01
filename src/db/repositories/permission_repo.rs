@@ -50,3 +50,22 @@ pub async fn find_by_name(
 
     Ok(permission)
 }
+
+pub async fn find_by_id(
+    pool: &PgPool,
+    id: Uuid,
+) -> Result<Option<Permission>> {
+    let permission =
+        sqlx::query_as::<_, Permission>(
+            r#"
+            SELECT *
+            FROM permissions
+            WHERE id = $1
+            "#
+        )
+        .bind(id)
+        .fetch_optional(pool)
+        .await?;
+
+    Ok(permission)
+}

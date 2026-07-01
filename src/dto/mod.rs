@@ -4,3 +4,4 @@ pub mod session;
 pub mod organization;
 pub mod member;
 pub mod role;
+pub mod permission;
