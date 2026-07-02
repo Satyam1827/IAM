@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use axum::{
-    routing::post,
+    routing::{post, delete},
     Router,
 };
 
@@ -17,5 +17,14 @@ pub fn router()
         .route(
             "/{id}/api-keys",
             post(api_key::create),
+        )
+        .route(
+            "/:id/api-keys",
+            post(api_key::create)
+                .get(api_key::list),
+        )
+        .route(
+            "/:org_id/api-keys/:key_id",
+            delete(api_key::revoke),
         )
 }

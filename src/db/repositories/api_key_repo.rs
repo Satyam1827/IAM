@@ -37,25 +37,24 @@ pub async fn create(
     Ok(api_key)
 }
 
-pub async fn list_by_organization(
+pub async fn find_by_id(
     pool: &PgPool,
-    organization_id: Uuid,
-) -> Result<Vec<ApiKey>> {
-    let keys =
+    id: Uuid,
+) -> Result<Option<ApiKey>> {
+    let key =
         sqlx::query_as::<_, ApiKey>(
             r#"
             SELECT *
             FROM api_keys
-            WHERE organization_id = $1
+            WHERE id = $1
             "#
         )
-        .bind(organization_id)
-        .fetch_all(pool)
+        .bind(id)
+        .fetch_optional(pool)
         .await?;
 
-    Ok(keys)
+    Ok(key)
 }
-
 // Find API Key By Hash Verification
 pub async fn all(
     pool: &PgPool,
@@ -67,6 +66,43 @@ pub async fn all(
             FROM api_keys
             "#
         )
+        .fetch_all(pool)
+        .await?;
+
+    Ok(keys)
+}
+
+pub async fn delete(
+    pool: &PgPool,
+    id: Uuid,
+) -> Result<()> {
+    sqlx::query(
+        r#"
+        DELETE FROM api_keys
+        WHERE id = $1
+        "#
+    )
+    .bind(id)
+    .execute(pool)
+    .await?;
+
+    Ok(())
+}
+
+pub async fn list_by_organization(
+    pool: &PgPool,
+    organization_id: Uuid,
+) -> Result<Vec<ApiKey>> {
+    let keys =
+        sqlx::query_as::<_, ApiKey>(
+            r#"
+            SELECT *
+            FROM api_keys
+            WHERE organization_id = $1
+            ORDER BY created_at DESC
+            "#
+        )
+        .bind(organization_id)
         .fetch_all(pool)
         .await?;
 
