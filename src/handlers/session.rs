@@ -1,18 +1,21 @@
 use std::sync::Arc;
 
 use axum::{
-    extract::State,
+    extract::{
+        Path,
+        State,
+    },
     Json,
 };
+use uuid::Uuid;
 
 use crate::{
     auth::extractor::CurrentUser,
-    db::repositories::session_repo,
     dto::session::SessionResponse,
     errors::AppError,
+    services::session,
     state::AppState,
 };
-
 pub async fn list(
     current_user: CurrentUser,
     State(state): State<Arc<AppState>>,
@@ -21,26 +24,26 @@ pub async fn list(
     AppError,
 > {
     let sessions =
-        session_repo::find_by_user(
-            &state.db,
-            current_user.user_id,
+        session::list(
+            state,
+            current_user,
         )
-        .await
-        .map_err(|_| {
-            AppError::Internal
-        })?;
+        .await?;
 
-    let response =
-        sessions
-            .into_iter()
-            .map(|s| SessionResponse {
-                id: s.id,
-                user_agent: s.user_agent,
-                ip_address: s.ip_address,
-                expires_at: s.expires_at,
-                created_at: s.created_at,
-            })
-            .collect();
+    Ok(Json(sessions))
+}
 
-    Ok(Json(response))
+
+pub async fn revoke(
+    current_user: CurrentUser,
+    Path(session_id): Path<Uuid>,
+    State(state): State<Arc<AppState>>,
+) -> Result<(), AppError>
+{
+    session::revoke(
+        state,
+        current_user,
+        session_id,
+    )
+    .await
 }

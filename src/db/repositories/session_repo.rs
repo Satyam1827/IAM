@@ -118,3 +118,23 @@ pub async fn update_refresh_token(
 
     Ok(())
 }
+
+pub async fn list_by_user(
+    pool: &PgPool,
+    user_id: Uuid,
+) -> Result<Vec<Session>> {
+    let sessions =
+        sqlx::query_as::<_, Session>(
+            r#"
+            SELECT *
+            FROM sessions
+            WHERE user_id = $1
+            ORDER BY created_at DESC
+            "#
+        )
+        .bind(user_id)
+        .fetch_all(pool)
+        .await?;
+
+    Ok(sessions)
+}
