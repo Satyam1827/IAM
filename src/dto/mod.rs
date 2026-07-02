@@ -5,3 +5,4 @@ pub mod organization;
 pub mod member;
 pub mod role;
 pub mod permission;
+pub mod api_key;

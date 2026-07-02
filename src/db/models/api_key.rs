@@ -10,5 +10,6 @@ pub struct ApiKey {
     pub key_hash: String,
     pub expires_at: Option<DateTime<Utc>>,
     pub last_used_at: Option<DateTime<Utc>>,
+    pub created_by: Option<Uuid>,
     pub created_at: DateTime<Utc>,
 }
