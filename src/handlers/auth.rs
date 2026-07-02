@@ -37,20 +37,18 @@ pub async fn login(
 }
 
 pub async fn refresh(
-    current_user: CurrentUser,
     State(state): State<Arc<AppState>>,
     Json(req): Json<RefreshRequest>,
-) -> Result<Json<TokenResponse>, AppError>
-{
-    let tokens =
+) -> Result<Json<TokenResponse>, AppError> {
+    let response =
         auth::refresh(
             state,
-            current_user.session_id,
+            req.session_id,
             req.refresh_token,
         )
         .await?;
 
-    Ok(Json(tokens))
+    Ok(Json(response))
 }
 
 pub async fn logout(

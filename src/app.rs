@@ -40,17 +40,6 @@ pub fn create_router(
                 ),
             ),
     )
-    
-    .nest(
-    "/auth",
-    routes::auth::protected_router()
-        .route_layer(
-            middleware::from_fn_with_state(
-                state.clone(),
-                auth::auth,
-            ),
-        ),
-    )
 
     .nest(
     "/organizations",
@@ -124,6 +113,17 @@ pub fn create_router(
                     crate::middleware::api_key::auth,
                 ),
             )
+    )
+
+    .nest(
+        "/auth",
+        routes::auth::protected_router()
+            .route_layer(
+                middleware::from_fn_with_state(
+                    state.clone(),
+                    auth::auth,
+                ),
+            ),
     )
     .with_state(state)
 

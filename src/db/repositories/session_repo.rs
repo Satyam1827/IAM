@@ -118,4 +118,3 @@ pub async fn update_refresh_token(
 
     Ok(())
 }
-

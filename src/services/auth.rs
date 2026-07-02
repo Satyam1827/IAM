@@ -128,6 +128,7 @@ pub async fn login(
     Ok(TokenResponse {
         access_token: access,
         refresh_token: refresh,
+        session_id: session.id,
     })
 }
 
@@ -146,7 +147,13 @@ pub async fn refresh(
         .ok_or(
             AppError::Unauthorized,
         )?;
-
+    
+    // Check token expiry
+    if session.expires_at < Utc::now() {
+        return Err(
+            AppError::Unauthorized,
+        );
+    }
     let valid =
         jwt::verify_refresh_token(
             &refresh_token,
@@ -193,6 +200,7 @@ pub async fn refresh(
     Ok(TokenResponse {
         access_token: access,
         refresh_token: new_refresh,
+        session_id: session.id,
     })
 }
 
@@ -209,3 +217,4 @@ pub async fn logout(
 
     Ok(())
 }
+

@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use validator::Validate;
+use uuid::Uuid;
 
 #[derive(Debug, Deserialize, Validate)]
 pub struct RegisterRequest {
@@ -22,13 +23,15 @@ pub struct LoginRequest {
     pub password: String,
 }
 
-#[derive(Debug, Deserialize)]
-pub struct RefreshRequest {
-    pub refresh_token: String,
-}
-
 #[derive(Debug, Serialize)]
 pub struct TokenResponse {
     pub access_token: String,
+    pub refresh_token: String,
+    pub session_id: Uuid,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct RefreshRequest {
+    pub session_id: Uuid,
     pub refresh_token: String,
 }
