@@ -68,3 +68,25 @@ pub async fn create(
 
     Ok(user)
 }
+
+pub async fn update_name(
+    pool: &PgPool,
+    id: Uuid,
+    name: &str,
+) -> Result<User> {
+    let user =
+        sqlx::query_as::<_, User>(
+            r#"
+            UPDATE users
+            SET name = $2
+            WHERE id = $1
+            RETURNING *
+            "#
+        )
+        .bind(id)
+        .bind(name)
+        .fetch_one(pool)
+        .await?;
+
+    Ok(user)
+}

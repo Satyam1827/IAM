@@ -7,33 +7,47 @@ use axum::{
 
 use crate::{
     auth::extractor::CurrentUser,
-    db::repositories::user_repo,
-    dto::user::UserResponse,
+    dto::user::{
+        UpdateProfileRequest,
+        UserProfileResponse,
+    },
     errors::AppError,
+    services::user,
     state::AppState,
 };
 
 pub async fn me(
     current_user: CurrentUser,
     State(state): State<Arc<AppState>>,
-) -> Result<Json<UserResponse>, AppError>
-{
-    let user =
-        user_repo::find_by_id(
-            &state.db,
-            current_user.user_id,
+) -> Result<
+    Json<UserProfileResponse>,
+    AppError,
+> {
+    let profile =
+        user::me(
+            state,
+            current_user,
         )
-        .await
-        .map_err(|_| {
-            AppError::Internal
-        })?
-        .ok_or(
-            AppError::NotFound,
-        )?;
+        .await?;
 
-    Ok(Json(UserResponse {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-    }))
+    Ok(Json(profile))
+}
+
+pub async fn update(
+    current_user: CurrentUser,
+    State(state): State<Arc<AppState>>,
+    Json(req): Json<UpdateProfileRequest>,
+) -> Result<
+    Json<UserProfileResponse>,
+    AppError,
+> {
+    let profile =
+        user::update(
+            state,
+            current_user,
+            req,
+        )
+        .await?;
+
+    Ok(Json(profile))
 }

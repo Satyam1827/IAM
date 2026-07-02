@@ -16,15 +16,11 @@ pub fn router()
     Router::new()
         .route(
             "/{id}/api-keys",
-            post(api_key::create),
-        )
-        .route(
-            "/:id/api-keys",
             post(api_key::create)
                 .get(api_key::list),
         )
         .route(
-            "/:org_id/api-keys/:key_id",
+            "/{org_id}/api-keys/{key_id}",
             delete(api_key::revoke),
         )
 }

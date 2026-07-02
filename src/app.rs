@@ -19,16 +19,6 @@ pub fn create_router(
         "/auth",
         routes::auth::router(),
     )
-    .nest(
-        "/users",
-        routes::user::router()
-            .route_layer(
-                middleware::from_fn_with_state(
-                    state.clone(),
-                    auth::auth,
-                ),
-            ),
-    )
     
     .nest(
         "/sessions",
@@ -136,8 +126,18 @@ pub fn create_router(
                 ),
             ),
     )
+
+    .nest(
+        "/users",
+        routes::user::router()
+            .route_layer(
+                middleware::from_fn_with_state(
+                    state.clone(),
+                    auth::auth,
+                ),
+            ),
+    )
     .with_state(state)
 
     
 }
-

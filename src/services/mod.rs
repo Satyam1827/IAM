@@ -8,3 +8,4 @@ pub mod audit;
 pub mod api_key;
 pub mod api_key_auth;
 pub mod session;
+pub mod user;
