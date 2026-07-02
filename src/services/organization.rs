@@ -126,6 +126,16 @@ pub async fn create(
         .map_err(|_| {
             AppError::Internal
         })?;
+    
+    crate::services::audit::log(
+        state.clone(),
+        Some(organization.id),
+        Some(current_user.user_id),
+        "organization.create",
+        Some("organization"),
+        Some(organization.id),
+    )
+    .await;
 
     
 

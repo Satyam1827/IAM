@@ -72,6 +72,16 @@ pub async fn add(
         .map_err(|_| {
             AppError::Internal
         })?;
+    
+    crate::services::audit::log(
+        state.clone(),
+        Some(organization_id),
+        Some(current_user.user_id),
+        "member.add",
+        Some("user"),
+        Some(req.user_id),
+    )
+    .await;
 
     Ok(MemberResponse {
         user_id:
@@ -181,6 +191,16 @@ pub async fn remove(
     )
     .await
     .map_err(|_| AppError::Internal)?;
+
+    crate::services::audit::log(
+        state.clone(),
+        Some(organization_id),
+        Some(current_user.user_id),
+        "member.remove",
+        Some("user"),
+        Some(user_id),
+    )
+    .await;
 
     Ok(())
 }

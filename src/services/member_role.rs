@@ -78,5 +78,15 @@ pub async fn assign(
     .await
     .map_err(|_| AppError::Internal)?;
 
+    crate::services::audit::log(
+        state.clone(),
+        Some(organization_id),
+        Some(current_user.user_id),
+        "role.assign",
+        Some("user"),
+        Some(user_id),
+    )
+    .await;
+
     Ok(())
 }

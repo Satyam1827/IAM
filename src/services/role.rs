@@ -51,6 +51,16 @@ pub async fn create(
             AppError::Internal
         })?;
 
+    crate::services::audit::log(
+        state.clone(),
+        Some(organization_id),
+        Some(current_user.user_id),
+        "role.create",
+        Some("role"),
+        Some(role.id),
+    )
+    .await;
+
     Ok(RoleResponse {
         id: role.id,
         name: role.name,

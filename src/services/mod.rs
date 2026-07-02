@@ -4,3 +4,4 @@ pub mod member;
 pub mod role;
 pub mod member_role;
 pub mod role_permission;
+pub mod audit;
