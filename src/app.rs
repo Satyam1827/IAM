@@ -115,6 +115,16 @@ pub fn create_router(
                 ),
             ),
     )
+
+    .merge(
+        routes::test::router()
+            .route_layer(
+                middleware::from_fn_with_state(
+                    state.clone(),
+                    crate::middleware::api_key::auth,
+                ),
+            )
+    )
     .with_state(state)
 
     

@@ -7,3 +7,4 @@ pub mod role;
 pub mod member_role;
 pub mod role_permission;
 pub mod api_key;
+pub mod test;

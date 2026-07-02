@@ -36,3 +36,39 @@ pub async fn create(
 
     Ok(api_key)
 }
+
+pub async fn list_by_organization(
+    pool: &PgPool,
+    organization_id: Uuid,
+) -> Result<Vec<ApiKey>> {
+    let keys =
+        sqlx::query_as::<_, ApiKey>(
+            r#"
+            SELECT *
+            FROM api_keys
+            WHERE organization_id = $1
+            "#
+        )
+        .bind(organization_id)
+        .fetch_all(pool)
+        .await?;
+
+    Ok(keys)
+}
+
+// Find API Key By Hash Verification
+pub async fn all(
+    pool: &PgPool,
+) -> Result<Vec<ApiKey>> {
+    let keys =
+        sqlx::query_as::<_, ApiKey>(
+            r#"
+            SELECT *
+            FROM api_keys
+            "#
+        )
+        .fetch_all(pool)
+        .await?;
+
+    Ok(keys)
+}

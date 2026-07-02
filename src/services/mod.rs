@@ -6,3 +6,4 @@ pub mod member_role;
 pub mod role_permission;
 pub mod audit;
 pub mod api_key;
+pub mod api_key_auth;
