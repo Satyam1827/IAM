@@ -115,3 +115,61 @@ pub fn generate_token_pair(
 
     Ok((access, refresh))
 }
+
+
+#[test]
+fn access_token_roundtrip() {
+    let secret =
+        "my-secret";
+
+    let user_id =
+        uuid::Uuid::new_v4();
+
+    let session_id =
+        uuid::Uuid::new_v4();
+
+    let token =
+        generate_access_token(
+            user_id,
+            session_id,
+            secret,
+        )
+        .unwrap();
+
+    let claims =
+        verify_access_token(
+            &token,
+            secret,
+        )
+        .unwrap();
+
+    assert_eq!(
+        claims.sub,
+        user_id.to_string(),
+    );
+
+    assert_eq!(
+        claims.session_id,
+        session_id.to_string(),
+    );
+}
+
+#[test]
+fn refresh_token_roundtrip() {
+    let refresh =
+        generate_refresh_token();
+
+    let hash =
+        hash_refresh_token(
+            &refresh,
+        )
+        .unwrap();
+
+    assert!(
+        verify_refresh_token(
+            &refresh,
+            &hash,
+        )
+        .unwrap()
+    );
+}

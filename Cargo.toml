@@ -35,3 +35,6 @@ jsonwebtoken = { version = "10", features = ["rust_crypto"] }
 validator = { version = "0.20", features = ["derive"] }
 rand = "0.9"
 base64 = "0.22"
+
+tower = "0.5"
+http-body-util = "0.1"

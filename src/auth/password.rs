@@ -44,3 +44,42 @@ pub fn verify_password(
             .is_ok(),
     )
 }
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn hash_and_verify_password() {
+        let password =
+            "secret123";
+
+        let hash =
+            hash_password(password)
+                .unwrap();
+
+        assert!(
+            verify_password(
+                password,
+                &hash
+            )
+            .unwrap()
+        );
+    }
+
+    #[test]
+    fn wrong_password_fails() {
+        let hash =
+            hash_password("secret123")
+                .unwrap();
+
+        assert!(
+            !verify_password(
+                "wrong",
+                &hash
+            )
+            .unwrap()
+        );
+    }
+}
