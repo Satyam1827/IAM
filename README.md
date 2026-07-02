@@ -144,6 +144,23 @@ cargo run
 cargo test
 ```
 
+## Running with Docker
+
+Create `.env` from `.env.example`.
+
+Build and start:
+
+```bash
+docker compose up --build
+```
+
+Run database migrations:
+
+```bash
+cargo install sqlx-cli
+sqlx migrate run
+```
+
 ## Future Improvements
 - Pagination and filtering
 - Email verification
